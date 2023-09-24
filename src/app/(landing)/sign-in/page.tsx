@@ -1,7 +1,12 @@
-import EmailSignIn from "@/app/(landing)/sign-in/email-sign-in";
-import GithubSignIn from "@/app/(landing)/sign-in/github-sign-in";
+import EmailSignIn from "@/app/(landing)/_components/email-sign-in";
+import GithubSignIn from "@/app/(landing)/_components/github-sign-in";
+import { getPageSession } from "@/lib/get-page-session";
+import { redirect } from "next/navigation";
 
-export default function SignInPage() {
+export default async function SignInPage() {
+  const session = await getPageSession();
+  if (session) redirect("/app");
+
   return (
     <div className="w-screen h-screen flex justify-center items-center">
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 px-6 md:px-0 sm:w-[500px]">
@@ -15,7 +20,7 @@ export default function SignInPage() {
             </p>
           </div>
           <div className="grid gap-6">
-            <EmailSignIn />
+            <EmailSignIn action="/api/auth/sign-in" />
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
