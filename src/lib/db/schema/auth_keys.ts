@@ -2,7 +2,7 @@
 import { varchar } from "drizzle-orm/mysql-core";
 import { mysqlTable } from "../mysql-table";
 
-export const key = mysqlTable("user_key", {
+export const authKeys = mysqlTable("auth_keys", {
   id: varchar("id", {
     length: 255,
   }).primaryKey(),

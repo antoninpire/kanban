@@ -9,7 +9,7 @@ export const tags = mysqlTable("tags", {
   id: int("id").primaryKey().autoincrement(),
   label: varchar("label", { length: 15 }).notNull(),
   color: varchar("color", { length: 7 }).notNull(),
-  projectId: varchar("projectId", { length: 255 }).notNull(),
+  projectId: varchar("projectId", { length: 28 }).notNull(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
 });
 

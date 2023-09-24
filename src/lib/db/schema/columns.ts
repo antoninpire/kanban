@@ -8,8 +8,9 @@ import { tasks } from "./tasks";
 export const columns = mysqlTable("columns", {
   id: int("id").primaryKey().autoincrement(),
   name: varchar("name", { length: 75 }).notNull(),
-  projectId: varchar("projectId", { length: 255 }).notNull(),
+  projectId: varchar("projectId", { length: 28 }).notNull(),
   order: smallint("order").notNull().default(0),
+  color: varchar("color", { length: 7 }).notNull(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
 });

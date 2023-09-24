@@ -2,9 +2,9 @@
 import { relations } from "drizzle-orm";
 import { varchar } from "drizzle-orm/mysql-core";
 import { mysqlTable } from "../mysql-table";
-import { projectsByUsers } from "./projects-by-users";
+import { workspacesByUsers } from "./workspaces-by-users";
 
-export const users = mysqlTable("auth_user", {
+export const users = mysqlTable("users", {
   id: varchar("id", {
     length: 25,
   }).primaryKey(),
@@ -12,5 +12,5 @@ export const users = mysqlTable("auth_user", {
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
-  projectsByUser: many(projectsByUsers),
+  workspacesByUser: many(workspacesByUsers),
 }));

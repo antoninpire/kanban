@@ -44,3 +44,28 @@
     @apply bg-background text-foreground;
   }
 }
+
+::-webkit-scrollbar {
+  @apply w-2;
+  @apply h-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply !bg-muted;
+}
+::-webkit-scrollbar-thumb {
+  @apply rounded-sm !bg-muted-foreground/30;
+}
+
+html {
+  scrollbar-color: hsl(215.4 16.3% 56.9% / 0.3);
+}
+
+/* Firefox */
+/* https://developer.mozilla.org/en-US/docs/Web/CSS/scrollbar-color#browser_compatibility */
+html {
+  scrollbar-color: rgba(0, 0, 0, 0.2) rgba(255, 255, 255, 0.05);
+}
+html.dark {
+  scrollbar-color: rgba(255, 255, 255, 0.1) rgba(0, 0, 0, 0.05);
+}

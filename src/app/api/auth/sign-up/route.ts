@@ -1,5 +1,8 @@
 import { authSchema } from "@/common/auth-schema";
+import { db } from "@/lib/db";
+import { workspaces, workspacesByUsers } from "@/lib/db/schema";
 import { auth } from "@/lib/lucia";
+import { createId } from "@paralleldrive/cuid2";
 import * as context from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -41,12 +44,23 @@ export async function POST(request: NextRequest) {
         email,
       },
     });
+    const workspaceId = `ws_${createId()}`;
+    await Promise.all([
+      db.insert(workspaces).values({
+        name: "Personal Workspace",
+        id: workspaceId,
+      }),
+      db.insert(workspacesByUsers).values({
+        userId: user.userId,
+        workspaceId,
+      }),
+    ]);
     const authRequest = auth.handleRequest(request.method, context);
     authRequest.setSession(session);
     return new Response(null, {
       status: 302,
       headers: {
-        Location: "/app",
+        Location: `/app/${workspaceId}`,
       },
     });
   } catch (err) {

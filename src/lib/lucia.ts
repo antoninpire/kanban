@@ -5,9 +5,9 @@ import { nextjs_future } from "lucia/middleware";
 
 export const auth = lucia({
   adapter: planetscale(connection, {
-    key: "kanban_user_key",
-    session: "kanban_user_session",
-    user: "kanban_auth_user",
+    key: "kanban_auth_keys",
+    session: "kanban_auth_sessions",
+    user: "kanban_users",
   }),
   env: process.env.NODE_ENV !== "production" ? "DEV" : "PROD",
   middleware: nextjs_future(),

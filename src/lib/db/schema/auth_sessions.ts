@@ -2,7 +2,7 @@
 import { bigint, varchar } from "drizzle-orm/mysql-core";
 import { mysqlTable } from "../mysql-table";
 
-export const session = mysqlTable("user_session", {
+export const authSessions = mysqlTable("auth_sessions", {
   id: varchar("id", {
     length: 128,
   }).primaryKey(),
