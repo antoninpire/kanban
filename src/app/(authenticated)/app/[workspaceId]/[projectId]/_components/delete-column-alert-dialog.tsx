@@ -20,7 +20,7 @@ import { experimental_useFormStatus as useFormStatus } from "react-dom";
 type DeleteColumnAlertDialogProps = {
   workspaceId: string;
   projectId: string;
-  columnId: number;
+  columnId: string;
 };
 
 function SubmitButton() {

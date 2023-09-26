@@ -63,7 +63,7 @@ export default function Board(props: BoardProps) {
           ...acc,
           [col.id]: index,
         }),
-        {} as Record<number, number>
+        {} as Record<string, number>
       );
 
       setColumns(columnsCopy);
@@ -89,22 +89,28 @@ export default function Board(props: BoardProps) {
     }
 
     if (result.type === "TASK") {
+      const sourceColumnIndex = columnsCopy.findIndex(
+        (col) => col.id === source.droppableId
+      );
+      const destinationColumnIndex = columnsCopy.findIndex(
+        (col) => col.id === destination.droppableId
+      );
       if (source.droppableId !== destination.droppableId) {
-        const sourceColumn = columnsCopy[Number(source.droppableId)];
-        const destinationColumn = columnsCopy[Number(destination.droppableId)];
+        const sourceColumn = columnsCopy[sourceColumnIndex];
+        const destinationColumn = columnsCopy[destinationColumnIndex];
         const sourceTasks = [...(sourceColumn?.tasks ?? [])];
         const destinationTasks = [...(destinationColumn?.tasks ?? [])];
         const [removed] = sourceTasks.splice(source.index, 1);
         destinationTasks.splice(destination.index, 0, removed!);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        columnsCopy[Number(source.droppableId)] = {
+        columnsCopy[sourceColumnIndex] = {
           ...sourceColumn,
           tasks: sourceTasks,
         };
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        columnsCopy[Number(destination.droppableId)] = {
+        columnsCopy[destinationColumnIndex] = {
           ...destinationColumn,
           tasks: destinationTasks,
         };
@@ -114,14 +120,14 @@ export default function Board(props: BoardProps) {
             ...acc,
             [task.id]: index,
           }),
-          {} as Record<number, number>
+          {} as Record<string, number>
         );
         const destOrders = destinationTasks.reduce(
           (acc, task, index) => ({
             ...acc,
             [task.id]: index,
           }),
-          {} as Record<number, number>
+          {} as Record<string, number>
         );
 
         setColumns(columnsCopy);
@@ -130,9 +136,9 @@ export default function Board(props: BoardProps) {
           method: "PUT",
           body: JSON.stringify({
             sourceOrders,
-            destOrders,
+            destinationOrders: destOrders,
             sourceColumnId: sourceColumn!.id,
-            destColumnId: destinationColumn!.id,
+            destinationColumnId: destinationColumn!.id,
             taskId: removed!.id,
           }),
         });
@@ -149,13 +155,13 @@ export default function Board(props: BoardProps) {
 
         return;
       } else {
-        const column = columns[Number(source.droppableId)];
+        const column = columns[sourceColumnIndex];
         const copiedTasks = [...(column?.tasks ?? [])];
         const [removed] = copiedTasks.splice(source.index, 1);
         copiedTasks.splice(destination.index, 0, removed!);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        columnsCopy[Number(source.droppableId)] = {
+        columnsCopy[sourceColumnIndex] = {
           ...column,
           tasks: copiedTasks,
         };
@@ -194,32 +200,34 @@ export default function Board(props: BoardProps) {
     }
   };
 
+  if (!mounted) return null;
+
   return (
-    <>
-      {mounted && (
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="board" type="COLUMN" direction="horizontal">
-            {(provided) => (
-              <div
-                className="flex flex-nowrap gap-3 px-4"
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-              >
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Droppable droppableId="board" type="COLUMN" direction="horizontal">
+        {(provided) => (
+          <>
+            <div
+              className="flex"
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+            >
+              <div className="flex-nowrap flex gap-3 px-4">
                 {columns.map((column, index) => (
                   <ColumnCard
                     index={index}
-                    key={`column-${column.id}`}
+                    key={column.id}
                     column={column}
                     projectId={props.projectId}
                     workspaceId={props.workspaceId}
                   />
                 ))}
-                {provided.placeholder}
               </div>
-            )}
-          </Droppable>
-        </DragDropContext>
-      )}
-    </>
+            </div>
+            {provided.placeholder}
+          </>
+        )}
+      </Droppable>
+    </DragDropContext>
   );
 }

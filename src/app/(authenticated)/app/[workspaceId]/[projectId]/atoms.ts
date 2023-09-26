@@ -1,3 +1,3 @@
 import { atom } from "jotai";
 
-export const addTaskColumnIdAtom = atom<number | null>(null);
+export const addTaskColumnIdAtom = atom<string | null>(null);

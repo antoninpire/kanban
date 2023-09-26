@@ -87,7 +87,7 @@ export const createColumn = serverAction({
 
 export const deleteColumn = serverAction({
   input: z.object({
-    columnId: z.union([z.string(), z.number()]).transform(Number),
+    columnId: z.string().min(1),
     projectId: z.string().min(1),
     workspaceId: z.string().min(1),
   }),
@@ -129,7 +129,7 @@ export const deleteColumn = serverAction({
 export const createTask = serverAction({
   input: z.object({
     projectId: z.string().min(1),
-    columnId: z.string().min(1).transform(Number),
+    columnId: z.string().min(1),
     workspaceId: z.string().min(1),
     title: z.string().min(1, "Name cannot be empty"),
     description: z.string(),

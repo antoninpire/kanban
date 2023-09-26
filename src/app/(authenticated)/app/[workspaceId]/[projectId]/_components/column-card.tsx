@@ -9,9 +9,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Column, Task } from "@/lib/db/schema";
-import { hexToRgb } from "@/lib/utils";
 import { useSetAtom } from "jotai";
 import { Edit, MoreHorizontal, Plus } from "lucide-react";
 import { Draggable, Droppable } from "react-beautiful-dnd";
@@ -29,21 +27,19 @@ export default function ColumnCard(props: ColumnCardProps) {
   const { column, index, projectId, workspaceId } = props;
   const setColumnId = useSetAtom(addTaskColumnIdAtom);
 
-  const dragId = `column-${column.id}`;
-
-  const rgb = hexToRgb(column.color).join(",");
+  // const rgb = hexToRgb(column.color).join(",");
 
   return (
-    <Draggable draggableId={dragId} index={index}>
+    <Draggable draggableId={column.id} index={index}>
       {(provided) => (
         <div
           ref={provided.innerRef}
           {...provided.draggableProps}
-          className="h-[80vh] w-[280px] rounded-md flex flex-col gap-1 brightness-200"
-          style={{
-            ...provided.draggableProps.style,
-            backgroundColor: `rgba(${rgb}, 0.2)`,
-          }}
+          // className="h-[80vh] w-[280px] rounded-md flex flex-col gap-1 brightness-200"
+          // style={{
+          //   ...provided.draggableProps.style,
+          //   backgroundColor: `rgba(${rgb}, 0.2)`,
+          // }}
         >
           <div
             {...provided.dragHandleProps}
@@ -85,28 +81,22 @@ export default function ColumnCard(props: ColumnCardProps) {
               </Popover>
             </div>
           </div>
-          <ScrollArea className="pt-2 pl-2 pr-4">
-            <Droppable droppableId={index.toString()} type="TASK">
-              {(dropProvided) => (
-                <>
-                  <div
-                    ref={dropProvided.innerRef}
-                    className="flex flex-col gap-3.5"
-                    {...dropProvided.droppableProps}
-                  >
-                    {column.tasks.map((task, index) => (
-                      <TaskCard
-                        key={`task-${task.id}`}
-                        task={task}
-                        index={index}
-                      />
-                    ))}
-                  </div>
+          <Droppable key={column.id} droppableId={column.id} type="TASK">
+            {(dropProvided) => (
+              <>
+                <div
+                  className="h-[75vh] flex flex-col w-[280px] rounded-md p-[15px] gap-1 bg-white/5"
+                  ref={dropProvided.innerRef}
+                  {...dropProvided.droppableProps}
+                >
+                  {column.tasks.map((task, index) => (
+                    <TaskCard key={task.id} task={task} index={index} />
+                  ))}
                   {dropProvided.placeholder}
-                </>
-              )}
-            </Droppable>
-          </ScrollArea>
+                </div>
+              </>
+            )}
+          </Droppable>
         </div>
       )}
     </Draggable>

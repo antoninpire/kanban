@@ -7,13 +7,11 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
 const schema = z.object({
-  sourceOrders: z.record(z.string().transform(Number), z.number().int().min(0)),
-  sourceColumnId: z.number().int().min(1),
-  destinationOrders: z
-    .record(z.string().transform(Number), z.number().int().min(0))
-    .optional(),
-  destinationColumnId: z.number().int().min(1).optional(),
-  taskId: z.number().int().min(1).optional(),
+  sourceOrders: z.record(z.string(), z.number().int().min(0)),
+  sourceColumnId: z.string().min(1),
+  destinationOrders: z.record(z.string(), z.number().int().min(0)).optional(),
+  destinationColumnId: z.string().optional(),
+  taskId: z.string().min(1),
 });
 
 export async function PUT(request: NextRequest) {
@@ -47,10 +45,7 @@ export async function PUT(request: NextRequest) {
   try {
     const promises = [
       ...Object.entries(sourceOrders).map(([id, order]) =>
-        db
-          .update(tasks)
-          .set({ order })
-          .where(eq(tasks.id, Number(id)))
+        db.update(tasks).set({ order }).where(eq(tasks.id, id))
       ),
       ,
     ];
@@ -58,10 +53,7 @@ export async function PUT(request: NextRequest) {
     if (destinationOrders)
       promises.push(
         ...Object.entries(destinationOrders ?? []).map(([id, order]) =>
-          db
-            .update(tasks)
-            .set({ order })
-            .where(eq(tasks.id, Number(id)))
+          db.update(tasks).set({ order }).where(eq(tasks.id, id))
         )
       );
 

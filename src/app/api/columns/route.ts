@@ -7,7 +7,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
 const schema = z.object({
-  orders: z.record(z.string().transform(Number), z.number().int().min(0)),
+  orders: z.record(z.string(), z.number().int().min(0)),
 });
 
 export async function PUT(request: NextRequest) {
@@ -35,10 +35,7 @@ export async function PUT(request: NextRequest) {
   try {
     await Promise.all(
       Object.entries(orders).map(([id, order]) =>
-        db
-          .update(columns)
-          .set({ order })
-          .where(eq(columns.id, Number(id)))
+        db.update(columns).set({ order }).where(eq(columns.id, id))
       )
     );
   } catch (err) {
