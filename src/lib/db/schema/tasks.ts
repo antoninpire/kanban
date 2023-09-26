@@ -1,5 +1,5 @@
 /* eslint-disable no-relative-import-paths/no-relative-import-paths */
-import { relations } from "drizzle-orm";
+import { relations, type InferSelectModel } from "drizzle-orm";
 import {
   int,
   smallint,
@@ -30,3 +30,5 @@ export const tasksRelations = relations(tasks, ({ one, many }) => ({
   subTasks: many(subTasks),
   tags: many(tags),
 }));
+
+export type Task = InferSelectModel<typeof tasks>;

@@ -1,8 +1,21 @@
+import AddColumnDialog from "@/app/(authenticated)/app/[workspaceId]/[projectId]/_components/add-column-dialog";
+import AddTaskSheet from "@/app/(authenticated)/app/[workspaceId]/[projectId]/_components/add-task-sheet";
+import Board from "@/app/(authenticated)/app/[workspaceId]/[projectId]/_components/board";
 import { Button } from "@/components/ui/button";
 import { db } from "@/lib/db";
 import { getPageSession } from "@/lib/get-page-session";
 import { Plus, Tags, Users } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
+
+// const column: Column = {
+//   color: "#f87171",
+//   createdAt: new Date(),
+//   id: 1,
+//   name: "Backlog",
+//   order: 0,
+//   projectId: "1",
+//   updatedAt: new Date(),
+// };
 
 export default async function BoardPage({
   params,
@@ -15,45 +28,62 @@ export default async function BoardPage({
   const session = await getPageSession();
   if (!session) redirect("/sign-in");
 
-  const project = await db.query.projects.findFirst({
-    where: (table, { eq }) => eq(table.id, params.projectId),
-  });
+  const [project, columns] = await Promise.all([
+    db.query.projects.findFirst({
+      where: (table, { eq }) => eq(table.id, params.projectId),
+    }),
+    db.query.columns.findMany({
+      where: (table, { eq }) => eq(table.projectId, params.projectId),
+      orderBy: (table, { asc }) => asc(table.order),
+      with: {
+        tasks: {
+          orderBy: (table, { asc }) => asc(table.order),
+        },
+      },
+    }),
+  ]);
 
   if (!project) notFound();
 
   return (
-    <div className="w-full h-[100vh] overflow-hidden">
-      <div className="h-[15vh] mx-5 pt-6 pb-1.5 border-b border-b-neutral-600">
-        <h1 className="text-3xl font-semibold">{project.name}</h1>
-        <h4 className="font-light text-neutral-400">Manage {project.name}</h4>
-        <div className="h-12 flex items-end gap-2">
-          <Button size="xs" variant="outline">
-            <Plus size={18} />
-            Add Task
-          </Button>
-          <Button size="xs" variant="outline">
-            <Tags size={18} />
-            Manage Tags
-          </Button>
-          <Button size="xs" variant="outline">
-            <Users size={18} />
-            Manage Collaborators
-          </Button>
+    <>
+      <div className="w-full h-[100vh] overflow-hidden">
+        <div className="h-[15vh] mx-5 pt-6 pb-1.5 border-b border-b-neutral-600">
+          <h1 className="text-3xl font-semibold">{project.name}</h1>
+          <h4 className="font-light text-neutral-400">Manage {project.name}</h4>
+          <div className="h-12 flex items-end gap-2">
+            <Button size="xs" variant="outline">
+              <Plus size={18} />
+              Add Task
+            </Button>
+            <Button size="xs" variant="outline">
+              <Tags size={18} />
+              Manage Tags
+            </Button>
+            <Button size="xs" variant="outline">
+              <Users size={18} />
+              Manage Collaborators
+            </Button>
+          </div>
         </div>
-      </div>
 
-      <div className="flex overflow-x-scroll items-center h-[85vh] overflow-y-hidden">
-        <div className="flex flex-nowrap gap-3 px-4">
-          <div className="h-[80vh] w-[250px] bg-white/5 rounded-md">Hello</div>
-          <div className="h-[80vh] w-[250px] bg-white/5 rounded-md">Hello</div>
-          <div className="h-[80vh] w-[250px] bg-white/5 rounded-md">Hello</div>
-          <div className="h-[80vh] w-[250px] bg-white/5 rounded-md">Hello</div>
-          <div className="h-[80vh] w-[250px] bg-white/5 rounded-md">Hello</div>
-          <div className="h-[80vh] w-[250px] bg-white/5 rounded-md">Hello</div>
-          <div className="h-[80vh] w-[250px] bg-white/5 rounded-md">Hello</div>
-          <div className="h-[80vh] w-[250px] bg-white/5 rounded-md">Hello</div>
+        <div className="flex overflow-x-scroll items-center h-[85vh] overflow-y-hidden">
+          <Board
+            columns={columns}
+            workspaceId={params.workspaceId}
+            projectId={params.projectId}
+          />
+          <AddColumnDialog
+            columns={columns}
+            projectId={params.projectId}
+            workspaceId={params.workspaceId}
+          />
         </div>
       </div>
-    </div>
+      <AddTaskSheet
+        workspaceId={params.workspaceId}
+        projectId={params.projectId}
+      />
+    </>
   );
 }

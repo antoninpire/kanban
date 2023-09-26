@@ -38,6 +38,7 @@
     "cmdk": "^0.2.0",
     "dayjs": "^1.11.10",
     "drizzle-orm": "^0.28.6",
+    "jotai": "^2.4.2",
     "lucia": "^2.7.0",
     "lucide-react": "^0.279.0",
     "next": "13.5.2",
@@ -50,6 +51,7 @@
     "zod": "^3.22.2"
   },
   "devDependencies": {
+    "@types/react-beautiful-dnd": "^13.1.4",
     "@typescript-eslint/eslint-plugin": "^6.7.2",
     "@typescript-eslint/parser": "^6.7.2",
     "autoprefixer": "10.4.16",

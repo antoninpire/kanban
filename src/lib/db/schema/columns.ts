@@ -1,5 +1,5 @@
 /* eslint-disable no-relative-import-paths/no-relative-import-paths */
-import { relations } from "drizzle-orm";
+import { relations, type InferSelectModel } from "drizzle-orm";
 import { int, smallint, timestamp, varchar } from "drizzle-orm/mysql-core";
 import { mysqlTable } from "../mysql-table";
 import { projects } from "./projects";
@@ -22,3 +22,5 @@ export const columnsRelations = relations(columns, ({ one, many }) => ({
   }),
   tasks: many(tasks),
 }));
+
+export type Column = InferSelectModel<typeof columns>;
