@@ -1,6 +1,6 @@
 /* eslint-disable no-relative-import-paths/no-relative-import-paths */
 import { createId } from "@paralleldrive/cuid2";
-import { relations } from "drizzle-orm";
+import { relations, type InferSelectModel } from "drizzle-orm";
 import { boolean, smallint, timestamp, varchar } from "drizzle-orm/mysql-core";
 import { mysqlTable } from "../mysql-table";
 import { tasks } from "./tasks";
@@ -15,8 +15,12 @@ export const subTasks = mysqlTable("sub_tasks", {
   taskId: varchar("taskId", {
     length: 30,
   }).notNull(),
-  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
-  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt")
+    .notNull()
+    .$defaultFn(() => new Date()),
+  createdAt: timestamp("createdAt")
+    .notNull()
+    .$defaultFn(() => new Date()),
 });
 
 export const subTasksRelations = relations(subTasks, ({ one }) => ({
@@ -25,3 +29,5 @@ export const subTasksRelations = relations(subTasks, ({ one }) => ({
     references: [tasks.id],
   }),
 }));
+
+export type SubTask = InferSelectModel<typeof subTasks>;

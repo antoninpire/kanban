@@ -11,7 +11,9 @@ export const workspaces = mysqlTable("workspaces", {
     .primaryKey()
     .$defaultFn(() => `ws_${createId()}`),
   name: varchar("name", { length: 75 }).notNull(),
-  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  createdAt: timestamp("createdAt")
+    .notNull()
+    .$defaultFn(() => new Date()),
 });
 
 export const workspacesRelations = relations(workspaces, ({ many }) => ({

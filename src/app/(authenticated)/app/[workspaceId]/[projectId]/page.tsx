@@ -1,21 +1,12 @@
 import AddColumnDialog from "@/app/(authenticated)/app/[workspaceId]/[projectId]/_components/add-column-dialog";
-import AddTaskSheet from "@/app/(authenticated)/app/[workspaceId]/[projectId]/_components/add-task-sheet";
+import AddTaskDialog from "@/app/(authenticated)/app/[workspaceId]/[projectId]/_components/add-task-dialog";
 import Board from "@/app/(authenticated)/app/[workspaceId]/[projectId]/_components/board";
+import EditTaskSheet from "@/app/(authenticated)/app/[workspaceId]/[projectId]/_components/edit-task-sheet";
 import { Button } from "@/components/ui/button";
 import { db } from "@/lib/db";
 import { getPageSession } from "@/lib/get-page-session";
 import { Plus, Tags, Users } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
-
-// const column: Column = {
-//   color: "#f87171",
-//   createdAt: new Date(),
-//   id: 1,
-//   name: "Backlog",
-//   order: 0,
-//   projectId: "1",
-//   updatedAt: new Date(),
-// };
 
 export default async function BoardPage({
   params,
@@ -28,7 +19,7 @@ export default async function BoardPage({
   const session = await getPageSession();
   if (!session) redirect("/sign-in");
 
-  const [project, columns] = await Promise.all([
+  const [project, columns, tags] = await Promise.all([
     db.query.projects.findFirst({
       where: (table, { eq }) => eq(table.id, params.projectId),
     }),
@@ -38,8 +29,19 @@ export default async function BoardPage({
       with: {
         tasks: {
           orderBy: (table, { asc }) => asc(table.order),
+          with: {
+            tagsByTask: {
+              with: {
+                tag: true,
+              },
+            },
+            subTasks: true,
+          },
         },
       },
+    }),
+    db.query.tags.findMany({
+      where: (table, { eq }) => eq(table.projectId, params.projectId),
     }),
   ]);
 
@@ -80,9 +82,15 @@ export default async function BoardPage({
           />
         </div>
       </div>
-      <AddTaskSheet
+      <AddTaskDialog
         workspaceId={params.workspaceId}
         projectId={params.projectId}
+        tags={tags}
+      />
+      <EditTaskSheet
+        workspaceId={params.workspaceId}
+        // projectId={params.projectId}
+        tags={tags}
       />
     </>
   );

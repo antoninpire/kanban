@@ -14,8 +14,12 @@ export const columns = mysqlTable("columns", {
   projectId: varchar("projectId", { length: 28 }).notNull(),
   order: smallint("order").notNull().default(0),
   color: varchar("color", { length: 7 }).notNull(),
-  updatedAt: timestamp("updatedAt").notNull().defaultNow(),
-  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt")
+    .notNull()
+    .$defaultFn(() => new Date()),
+  createdAt: timestamp("createdAt")
+    .notNull()
+    .$defaultFn(() => new Date()),
 });
 
 export const columnsRelations = relations(columns, ({ one, many }) => ({

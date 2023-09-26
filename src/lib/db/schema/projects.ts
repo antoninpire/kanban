@@ -13,7 +13,9 @@ export const projects = mysqlTable("projects", {
     .$defaultFn(() => `prj_${createId()}`),
   name: varchar("name", { length: 75 }).notNull(),
   workspaceId: varchar("workspaceId", { length: 28 }).notNull(),
-  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  createdAt: timestamp("createdAt")
+    .notNull()
+    .$defaultFn(() => new Date()),
 });
 
 export const projectsRelations = relations(projects, ({ many, one }) => ({

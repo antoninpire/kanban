@@ -69,7 +69,7 @@ export default function AddColumnDialog(props: AddColumnDialogProps) {
         onClick={() => {
           setOpen(true);
         }}
-        className="h-[80vh] w-[280px] bg-white/5 opacity-50 rounded-md flex items-center justify-center px-6 hover:opacity-100"
+        className="h-[76vh] ml-3 mt-[38px] w-[280px] bg-white/5 opacity-50 rounded-md flex items-center justify-center px-6 hover:opacity-100"
       >
         <div className="flex items-center gap-2">
           <Plus size={18} />

@@ -35,7 +35,10 @@ export async function PUT(request: NextRequest) {
   try {
     await Promise.all(
       Object.entries(orders).map(([id, order]) =>
-        db.update(columns).set({ order }).where(eq(columns.id, id))
+        db
+          .update(columns)
+          .set({ order, updatedAt: new Date() })
+          .where(eq(columns.id, id))
       )
     );
   } catch (err) {

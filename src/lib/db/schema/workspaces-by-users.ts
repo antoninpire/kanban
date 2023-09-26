@@ -7,6 +7,7 @@ import {
   varchar,
 } from "drizzle-orm/mysql-core";
 import { mysqlTable } from "../mysql-table";
+import { users } from "./users";
 import { workspaces } from "./workspaces";
 
 export const workspacesByUsers = mysqlTable(
@@ -14,7 +15,9 @@ export const workspacesByUsers = mysqlTable(
   {
     userId: varchar("userId", { length: 25 }).notNull(),
     workspaceId: varchar("workspaceId", { length: 28 }).notNull(),
-    createdAt: timestamp("createdAt").notNull().defaultNow(),
+    createdAt: timestamp("createdAt")
+      .notNull()
+      .$defaultFn(() => new Date()),
     role: mysqlEnum("role", ["OWNER", "MEMBER"]).default("MEMBER"),
   },
   (table) => ({
@@ -29,9 +32,9 @@ export const workspacesByUsersRelations = relations(
       fields: [workspacesByUsers.workspaceId],
       references: [workspaces.id],
     }),
-    user: one(workspaces, {
+    user: one(users, {
       fields: [workspacesByUsers.userId],
-      references: [workspaces.id],
+      references: [users.id],
     }),
   })
 );

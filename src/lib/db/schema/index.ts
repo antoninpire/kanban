@@ -4,6 +4,7 @@ export * from "./columns";
 export * from "./projects";
 export * from "./sub-tasks";
 export * from "./tags";
+export * from "./tags-by-tasks";
 export * from "./tasks";
 export * from "./users";
 export * from "./workspaces";

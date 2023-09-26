@@ -1,8 +1,9 @@
 "use client";
 
 import ColumnCard from "@/app/(authenticated)/app/[workspaceId]/[projectId]/_components/column-card";
+import { type TaskWithRelations } from "@/app/(authenticated)/app/[workspaceId]/[projectId]/atoms";
 import { useToast } from "@/components/ui/use-toast";
-import type { Column, Task } from "@/lib/db/schema";
+import type { Column } from "@/lib/db/schema";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -13,7 +14,7 @@ import {
 
 type BoardProps = {
   columns: (Column & {
-    tasks: Task[];
+    tasks: TaskWithRelations[];
   })[];
   workspaceId: string;
   projectId: string;
@@ -132,7 +133,7 @@ export default function Board(props: BoardProps) {
 
         setColumns(columnsCopy);
 
-        const res = await fetch("/api/tasks", {
+        const res = await fetch("/api/tasks/order", {
           method: "PUT",
           body: JSON.stringify({
             sourceOrders,
@@ -176,7 +177,7 @@ export default function Board(props: BoardProps) {
 
         setColumns(columnsCopy);
 
-        const res = await fetch("/api/tasks", {
+        const res = await fetch("/api/tasks/order", {
           method: "PUT",
           body: JSON.stringify({
             sourceOrders: orders,
@@ -212,7 +213,7 @@ export default function Board(props: BoardProps) {
               ref={provided.innerRef}
               {...provided.droppableProps}
             >
-              <div className="flex-nowrap flex gap-3 px-4">
+              <div className="flex-nowrap flex gap-3 pl-4">
                 {columns.map((column, index) => (
                   <ColumnCard
                     index={index}
