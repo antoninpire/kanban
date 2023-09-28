@@ -89,12 +89,21 @@ export default function CreateProjectDialog(props: CreateProjectDialogProps) {
                 />
               </div>
               <div className="flex items-center space-x-2 mt-2.5">
-                <Checkbox id="withDefaults" name="withDefaults" />
+                <Checkbox id="withDefaultColumns" name="withDefaultColumns" />
                 <label
-                  htmlFor="withDefaults"
+                  htmlFor="withDefaultColumns"
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   Include default columns
+                </label>
+              </div>
+              <div className="flex items-center space-x-2 mt-2.5">
+                <Checkbox id="withDefaultTags" name="withDefaultTags" />
+                <label
+                  htmlFor="withDefaultTags"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Include default tags
                 </label>
               </div>
             </div>

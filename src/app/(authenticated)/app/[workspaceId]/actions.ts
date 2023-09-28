@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import {
   columns,
   projects,
+  tags,
   workspaces,
   workspacesByUsers,
 } from "@/lib/db/schema";
@@ -19,7 +20,8 @@ export const createProject = serverAction({
   input: z.object({
     name: z.string().min(1, "Project name must be at least 1 character"),
     workspaceId: z.string().min(1),
-    withDefaults: z.literal("on").or(z.undefined()),
+    withDefaultColumns: z.literal("on").or(z.undefined()),
+    withDefaultTags: z.literal("on").or(z.undefined()),
   }),
   handler: async ({ input }) => {
     const authRequest = auth.handleRequest("POST", context);
@@ -41,7 +43,7 @@ export const createProject = serverAction({
         })
       );
 
-      if (input.withDefaults === "on")
+      if (input.withDefaultColumns === "on")
         promises.push(
           db.insert(columns).values([
             {
@@ -73,6 +75,41 @@ export const createProject = serverAction({
               name: "Finished",
               color: "#ff2e2e",
               order: 4,
+            },
+          ])
+        );
+      if (input.withDefaultTags === "on")
+        promises.push(
+          db.insert(tags).values([
+            {
+              projectId,
+              label: "bug",
+              color: "#ef4444",
+            },
+            {
+              projectId,
+              label: "feature",
+              color: "#3b82f6",
+            },
+            {
+              projectId,
+              label: "ui",
+              color: "#f472b6",
+            },
+            {
+              projectId,
+              label: "doc",
+              color: "#15803d",
+            },
+            {
+              projectId,
+              label: "test",
+              color: "#eab308",
+            },
+            {
+              projectId,
+              label: "refacto",
+              color: "#64748b",
             },
           ])
         );

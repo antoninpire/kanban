@@ -157,6 +157,9 @@ export default function AddTaskDialog(props: AddTaskDialogProps) {
                           backgroundColor: checked
                             ? `rgba(${hexToRgb(tag.color).join(",")},0.4)`
                             : undefined,
+                          borderColor: checked
+                            ? `rgba(${hexToRgb(tag.color).join(",")},0.4)`
+                            : undefined,
                         }}
                         onClick={() => {
                           if (checked) {
@@ -167,7 +170,7 @@ export default function AddTaskDialog(props: AddTaskDialogProps) {
                             setCurrentTagIds((curr) => [...curr, tag.id]);
                           }
                         }}
-                        className="hover:cursor-pointer hover:bg-white/5 border-none"
+                        className="hover:cursor-pointer hover:bg-white/5"
                       >
                         {tag.label}
                       </Badge>
