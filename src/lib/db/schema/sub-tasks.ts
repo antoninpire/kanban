@@ -9,7 +9,7 @@ export const subTasks = mysqlTable("sub_tasks", {
   id: varchar("id", { length: 30 })
     .primaryKey()
     .$defaultFn(() => `stsk_${createId()}`),
-  title: varchar("title", { length: 75 }).notNull(),
+  title: varchar("title", { length: 128 }).notNull(),
   order: smallint("order").notNull().default(0),
   achieved: boolean("achieved").notNull().default(false),
   taskId: varchar("taskId", {

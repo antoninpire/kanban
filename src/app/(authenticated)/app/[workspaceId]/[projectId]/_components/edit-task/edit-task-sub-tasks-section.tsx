@@ -149,6 +149,7 @@ export default function EditTaskSubTasksSection(
                   defaultValue={subTask.title}
                   className="w-full bg-transparent py-2 outline-none border-none flex-grow"
                   placeholder="Your subtask here..."
+                  maxLength={128}
                 />
               </label>
             </div>
