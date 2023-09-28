@@ -48,9 +48,13 @@ export const GET = async (request: NextRequest) => {
         : null;
     }
 
+    let userExists = false;
     const getUser = async () => {
       const existingUser = prevUser ?? (await getExistingUser());
-      if (existingUser) return existingUser;
+      if (existingUser) {
+        userExists = true;
+        return existingUser;
+      }
       const user = await createUser({
         attributes: {
           email: githubUser.email ?? "",
@@ -66,17 +70,27 @@ export const GET = async (request: NextRequest) => {
         email: githubUser.email ?? "",
       },
     });
-    const workspaceId = `ws_${createId()}`;
-    await Promise.all([
-      db.insert(workspaces).values({
-        name: "Personal Workspace",
-        id: workspaceId,
-      }),
-      db.insert(workspacesByUsers).values({
-        userId: user.userId,
-        workspaceId,
-      }),
-    ]);
+    let workspaceId: string;
+    if (!userExists) {
+      workspaceId = `ws_${createId()}`;
+      await Promise.all([
+        db.insert(workspaces).values({
+          name: "Personal Workspace",
+          id: workspaceId,
+        }),
+        db.insert(workspacesByUsers).values({
+          userId: user.userId,
+          workspaceId,
+        }),
+      ]);
+    } else {
+      workspaceId =
+        (
+          await db.query.workspacesByUsers.findFirst({
+            where: (table, { eq }) => eq(table.userId, user.userId),
+          })
+        )?.workspaceId ?? "";
+    }
     const authRequest = auth.handleRequest(request.method, {
       cookies,
       headers,
