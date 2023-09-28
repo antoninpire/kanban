@@ -1,6 +1,8 @@
 import { db } from "@/lib/db";
+import { workspaces, workspacesByUsers } from "@/lib/db/schema";
 import { auth, githubAuth } from "@/lib/lucia";
 import { OAuthRequestError } from "@lucia-auth/oauth";
+import { createId } from "@paralleldrive/cuid2";
 import type { User } from "lucia";
 import { cookies, headers } from "next/headers";
 
@@ -64,6 +66,17 @@ export const GET = async (request: NextRequest) => {
         email: githubUser.email ?? "",
       },
     });
+    const workspaceId = `ws_${createId()}`;
+    await Promise.all([
+      db.insert(workspaces).values({
+        name: "Personal Workspace",
+        id: workspaceId,
+      }),
+      db.insert(workspacesByUsers).values({
+        userId: user.userId,
+        workspaceId,
+      }),
+    ]);
     const authRequest = auth.handleRequest(request.method, {
       cookies,
       headers,
@@ -72,7 +85,7 @@ export const GET = async (request: NextRequest) => {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: "/", // redirect to profile page
+        Location: `/app/${workspaceId}`,
       },
     });
   } catch (e) {
