@@ -1,5 +1,7 @@
+import { env } from "@/env.mjs";
 import { connection } from "@/lib/db";
 import { planetscale } from "@lucia-auth/adapter-mysql";
+import { github } from "@lucia-auth/oauth/providers";
 import { lucia } from "lucia";
 import { nextjs_future } from "lucia/middleware";
 
@@ -19,6 +21,12 @@ export const auth = lucia({
       email: data.email,
     };
   },
+});
+
+export const githubAuth = github(auth, {
+  clientId: env.GITHUB_CLIENT_ID,
+  clientSecret: env.GITHUB_CLIENT_SECRET,
+  scope: ["user:email"],
 });
 
 export type Auth = typeof auth;

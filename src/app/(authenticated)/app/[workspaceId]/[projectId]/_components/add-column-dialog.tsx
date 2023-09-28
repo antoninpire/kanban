@@ -85,7 +85,7 @@ export default function AddColumnDialog(props: AddColumnDialogProps) {
         <DialogContent className="sm:max-w-[425px]">
           <form action={handleAction}>
             <DialogHeader>
-              <DialogTitle>Create a Project</DialogTitle>
+              <DialogTitle>Add a Column</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">

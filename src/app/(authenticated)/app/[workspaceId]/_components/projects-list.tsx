@@ -26,12 +26,13 @@ export async function ProjectsList(props: ProjectsListProps) {
 
   const projects = await db.query.projects.findMany({
     where: (table, { eq }) => eq(table.workspaceId, workspaceId),
+    orderBy: (table, { desc }) => desc(table.createdAt),
   });
 
   if (!projects.length)
     return (
       <div className="w-full h-[75vh] flex justify-center items-center">
-        <p className="text-neutral-400 text-lg font-light">
+        <p className="text-neutral-300 text-lg font-light">
           No projects found.
         </p>
       </div>
@@ -40,7 +41,7 @@ export async function ProjectsList(props: ProjectsListProps) {
   return (
     <div className="flex items-center gap-y-4 gap-x-2 flex-wrap mt-4">
       {projects.map((project) => (
-        <Card key={project.id} className="w-[290px]">
+        <Card key={project.id} className="w-[290px] bg-white/5">
           <CardHeader className="py-4 pl-4 pr-1.5">
             <CardTitle className="text-lg flex items-center justify-between w-full">
               {project.name}
@@ -54,7 +55,7 @@ export async function ProjectsList(props: ProjectsListProps) {
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between mt-2.5">
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-neutral-300">
                 {dayjs(project.createdAt).format("MMMM D, YYYY")}
               </p>
               <Link href={`/app/${workspaceId}/${project.id}`}>

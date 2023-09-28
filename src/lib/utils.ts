@@ -21,3 +21,12 @@ export function hexToRgb(hex: string) {
       ?.map((x) => parseInt(x, 16)) ?? [0, 0, 0]
   );
 }
+
+export function getColorFromPriority(
+  priority: "high" | "medium" | "low" | undefined
+) {
+  if (priority === "low") return "bg-yellow-500/50";
+  else if (priority === "medium") return "bg-orange-500/50";
+  else if (priority === "high") return "bg-red-500/50";
+  return "bg-neutral-500/50";
+}

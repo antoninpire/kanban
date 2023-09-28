@@ -1,8 +1,7 @@
 "use client";
 
-import { createProject } from "@/app/(authenticated)/app/[workspaceId]/actions";
+import { createWorkspace } from "@/app/(authenticated)/app/[workspaceId]/actions";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -14,12 +13,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { experimental_useFormStatus as useFormStatus } from "react-dom";
-
-type CreateProjectDialogProps = {
-  workspaceId: string;
-};
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -31,15 +27,15 @@ function SubmitButton() {
   );
 }
 
-export default function CreateProjectDialog(props: CreateProjectDialogProps) {
+export default function CreateWorkspaceDialog() {
   const [open, setOpen] = useState(false);
 
-  const { workspaceId } = props;
   const { toast } = useToast();
+  const router = useRouter();
 
   async function handleAction(formData: FormData) {
-    const res = await createProject(formData);
-    if (res.error || res.result?.error) {
+    const res = await createWorkspace(formData);
+    if (res.error || res.result?.error || !res.result?.workspaceId) {
       toast({
         title: "Error",
         description: res.result?.error ?? res.error,
@@ -49,21 +45,23 @@ export default function CreateProjectDialog(props: CreateProjectDialogProps) {
     }
     toast({
       title: "Success",
-      description: "Project created !",
+      description: "Workspace created !",
     });
     setOpen(false);
+    router.push("/app/" + res.result.workspaceId);
   }
 
   return (
     <>
       <Button
+        variant="ghost"
+        className="w-full text-left"
         onClick={() => {
           setOpen(true);
         }}
-        className="flex items-center gap-2 whitespace-nowrap"
       >
-        <Plus size={18} />
-        Create Project
+        <Plus className="w-4 h-4" />
+        Create workspace
       </Button>
       <Dialog
         open={open}
@@ -74,7 +72,7 @@ export default function CreateProjectDialog(props: CreateProjectDialogProps) {
         <DialogContent className="sm:max-w-[425px]">
           <form action={handleAction}>
             <DialogHeader>
-              <DialogTitle>Create a Project</DialogTitle>
+              <DialogTitle>Create a Workspace</DialogTitle>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
@@ -83,23 +81,12 @@ export default function CreateProjectDialog(props: CreateProjectDialogProps) {
                 </Label>
                 <Input
                   id="name"
-                  placeholder="My Personal Project"
+                  placeholder="Personal Workspace"
                   className="col-span-3"
                   name="name"
                 />
               </div>
-              <div className="flex items-center space-x-2 mt-2.5">
-                <Checkbox id="withDefaults" name="withDefaults" />
-                <label
-                  htmlFor="withDefaults"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Include default columns
-                </label>
-              </div>
             </div>
-            <input type="hidden" value={workspaceId} name="workspaceId" />
-
             <DialogFooter>
               <SubmitButton />
             </DialogFooter>

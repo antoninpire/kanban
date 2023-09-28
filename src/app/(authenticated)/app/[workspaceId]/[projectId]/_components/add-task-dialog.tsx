@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import type { Tag } from "@/lib/db/schema";
+import { hexToRgb } from "@/lib/utils";
 import { useAtom } from "jotai";
 import { useState } from "react";
 import { experimental_useFormStatus as useFormStatus } from "react-dom";
@@ -41,7 +42,7 @@ export default function AddTaskDialog(props: AddTaskDialogProps) {
   const [priority, setPriority] = useState<
     "low" | "medium" | "high" | undefined
   >();
-  const [currentTagIds, setCurrentTagIds] = useState<number[]>([]);
+  const [currentTagIds, setCurrentTagIds] = useState<string[]>([]);
 
   const { projectId, workspaceId, tags } = props;
   const { toast } = useToast();
@@ -60,6 +61,8 @@ export default function AddTaskDialog(props: AddTaskDialogProps) {
       title: "Success",
       description: "Column added !",
     });
+    setCurrentTagIds([]);
+    setPriority(undefined);
     setColumnId(null);
   }
 
@@ -151,7 +154,9 @@ export default function AddTaskDialog(props: AddTaskDialogProps) {
                         key={"tag-" + tag.id}
                         variant="outline"
                         style={{
-                          backgroundColor: checked ? tag.color : undefined,
+                          backgroundColor: checked
+                            ? `rgba(${hexToRgb(tag.color).join(",")},0.4)`
+                            : undefined,
                         }}
                         onClick={() => {
                           if (checked) {
@@ -162,7 +167,7 @@ export default function AddTaskDialog(props: AddTaskDialogProps) {
                             setCurrentTagIds((curr) => [...curr, tag.id]);
                           }
                         }}
-                        className="hover:cursor-pointer hover:bg-white/5"
+                        className="hover:cursor-pointer hover:bg-white/5 border-none"
                       >
                         {tag.label}
                       </Badge>

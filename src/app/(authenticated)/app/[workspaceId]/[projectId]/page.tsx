@@ -1,11 +1,13 @@
 import AddColumnDialog from "@/app/(authenticated)/app/[workspaceId]/[projectId]/_components/add-column-dialog";
 import AddTaskDialog from "@/app/(authenticated)/app/[workspaceId]/[projectId]/_components/add-task-dialog";
 import Board from "@/app/(authenticated)/app/[workspaceId]/[projectId]/_components/board";
+import EditColumnDialog from "@/app/(authenticated)/app/[workspaceId]/[projectId]/_components/edit-column-dialog";
 import EditTaskSheet from "@/app/(authenticated)/app/[workspaceId]/[projectId]/_components/edit-task-sheet";
+import ManageTagsDialog from "@/app/(authenticated)/app/[workspaceId]/[projectId]/_components/manage-tags-dialog";
 import { Button } from "@/components/ui/button";
 import { db } from "@/lib/db";
 import { getPageSession } from "@/lib/get-page-session";
-import { Plus, Tags, Users } from "lucide-react";
+import { Plus, Users } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 
 export default async function BoardPage({
@@ -52,16 +54,17 @@ export default async function BoardPage({
       <div className="w-full h-[100vh] overflow-hidden">
         <div className="h-[15vh] mx-5 pt-6 pb-1.5 border-b border-b-neutral-600">
           <h1 className="text-3xl font-semibold">{project.name}</h1>
-          <h4 className="font-light text-neutral-400">Manage {project.name}</h4>
+          <h4 className="font-light text-neutral-300">Manage {project.name}</h4>
           <div className="h-12 flex items-end gap-2">
             <Button size="xs" variant="outline">
               <Plus size={18} />
               Add Task
             </Button>
-            <Button size="xs" variant="outline">
-              <Tags size={18} />
-              Manage Tags
-            </Button>
+            <ManageTagsDialog
+              tags={tags}
+              projectId={params.projectId}
+              workspaceId={params.workspaceId}
+            />
             <Button size="xs" variant="outline">
               <Users size={18} />
               Manage Collaborators
@@ -89,8 +92,12 @@ export default async function BoardPage({
       />
       <EditTaskSheet
         workspaceId={params.workspaceId}
-        // projectId={params.projectId}
+        projectId={params.projectId}
         tags={tags}
+      />
+      <EditColumnDialog
+        workspaceId={params.workspaceId}
+        projectId={params.projectId}
       />
     </>
   );

@@ -71,7 +71,7 @@ export const createColumn = serverAction({
             .map((col) =>
               db
                 .update(columns)
-                .set({ order: col.order + 1 })
+                .set({ order: col.order + 1, updatedAt: new Date() })
                 .where(eq(columns.id, col.id))
             )
         );
@@ -82,6 +82,55 @@ export const createColumn = serverAction({
         error: "Unknown error while adding a column",
       };
     }
+    revalidatePath("/app/" + input.workspaceId + "/" + input.projectId);
+  },
+});
+
+export const editColumn = serverAction({
+  input: z.object({
+    workspaceId: z.string().min(1),
+    projectId: z.string().min(1),
+    columnId: z.string().min(1),
+    name: z.string().min(1, "Name cannot be empty"),
+    color: z.string().min(1),
+  }),
+  handler: async ({ input }) => {
+    const authRequest = auth.handleRequest("POST", context);
+    const session = await authRequest.validate();
+
+    if (!session) {
+      return {
+        error: "You must be logged in to add a column to a project",
+      };
+    }
+
+    const workspaces = await db.query.workspacesByUsers.findMany({
+      where: (table, { eq }) => eq(table.userId, session.user.userId),
+    });
+
+    if (!workspaces.some((ws) => ws.workspaceId === input.workspaceId)) {
+      return {
+        error:
+          "You must be a member of the workspace to add a column to a project",
+      };
+    }
+
+    try {
+      await db
+        .update(columns)
+        .set({
+          color: input.color,
+          name: input.name,
+        })
+        .where(eq(columns.id, input.columnId));
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+      return {
+        error: "Unknown error while editing the column",
+      };
+    }
+
     revalidatePath("/app/" + input.workspaceId + "/" + input.projectId);
   },
 });
@@ -132,18 +181,19 @@ export const deleteColumn = serverAction({
       });
       await Promise.all([
         db.delete(columns).where(eq(columns.id, input.columnId)),
-        prevColumns.map((col) =>
+        ...prevColumns.map((col) =>
           db
             .update(columns)
-            .set({ order: col.order - 1 })
+            .set({ order: col.order - 1, updatedAt: new Date() })
             .where(eq(columns.id, col.id))
         ),
+        db.delete(tasks).where(eq(tasks.columnId, input.columnId)),
       ]);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
       return {
-        error: "Unknown error while colunm from project",
+        error: "Unknown error while deleting the column from the project",
       };
     }
 
@@ -158,7 +208,7 @@ export const createTask = serverAction({
     workspaceId: z.string().min(1),
     title: z.string().min(1, "Name cannot be empty"),
     description: z.string(),
-    priority: z.enum(["low", "medium", "high"]).optional(),
+    priority: z.enum(["low", "medium", "high", ""]),
     tags: z.string(),
   }),
   handler: async ({ input }) => {
@@ -195,14 +245,14 @@ export const createTask = serverAction({
           title: input.title,
           description: input.description,
           columnId: input.columnId,
-          priority: input.priority,
+          priority: input.priority || null,
           order,
           id,
         }),
         ...(input.tags.length
           ? input.tags.split("|").map((tagId) =>
               db.insert(tagsByTasks).values({
-                tagId: Number(tagId),
+                tagId: tagId,
                 taskId: id,
               })
             )
@@ -215,6 +265,69 @@ export const createTask = serverAction({
         error: "Unknown error while adding a task",
       };
     }
+    revalidatePath("/app/" + input.workspaceId + "/" + input.projectId);
+  },
+});
+
+export const deleteTask = serverAction({
+  input: z.object({
+    taskId: z.string().min(1),
+    projectId: z.string().min(1),
+    columnId: z.string().min(1),
+    workspaceId: z.string().min(1),
+  }),
+  handler: async ({ input }) => {
+    const authRequest = auth.handleRequest("POST", context);
+    const session = await authRequest.validate();
+
+    if (!session) {
+      return {
+        error: "You must be logged in to delete a column from a project",
+      };
+    }
+
+    const workspaces = await db.query.workspacesByUsers.findMany({
+      where: (table, { eq }) => eq(table.userId, session.user.userId),
+    });
+
+    if (!workspaces.some((ws) => ws.workspaceId === input.workspaceId)) {
+      return {
+        error:
+          "You must be a member of the workspace to delete a column from a project",
+      };
+    }
+
+    try {
+      const task = await db.query.tasks.findFirst({
+        where: (table, { eq }) => eq(table.id, input.taskId),
+      });
+
+      if (!task)
+        return {
+          error: "Task not found",
+        };
+
+      const prevTasks = await db.query.tasks.findMany({
+        where: (table, { and, eq }) =>
+          and(eq(table.columnId, input.columnId), gt(table.order, task.order)),
+      });
+      await Promise.all([
+        db.delete(tasks).where(eq(tasks.id, input.taskId)),
+        ...prevTasks.map((tsk) =>
+          db
+            .update(tasks)
+            .set({ order: tsk.order - 1, updatedAt: new Date() })
+            .where(eq(tasks.id, tsk.id))
+        ),
+      ]);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+      return {
+        error: "Unknown error while deleting the task",
+      };
+    }
+
     revalidatePath("/app/" + input.workspaceId + "/" + input.projectId);
   },
 });

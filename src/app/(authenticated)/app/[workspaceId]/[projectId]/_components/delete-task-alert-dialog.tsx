@@ -1,6 +1,7 @@
 "use client";
 
-import { deleteProject } from "@/app/(authenticated)/app/[workspaceId]/actions";
+import { deleteTask } from "@/app/(authenticated)/app/[workspaceId]/[projectId]/actions";
+import { editTaskAtom } from "@/app/(authenticated)/app/[workspaceId]/[projectId]/atoms";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,13 +14,16 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { useSetAtom } from "jotai";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { experimental_useFormStatus as useFormStatus } from "react-dom";
 
-type DeleteProjectDialogProps = {
+type DeleteTaskAlertDialogProps = {
   workspaceId: string;
   projectId: string;
+  columnId: string;
+  taskId: string;
 };
 
 function SubmitButton() {
@@ -32,16 +36,17 @@ function SubmitButton() {
   );
 }
 
-export default function DeleteProjectAlertDialog(
-  props: DeleteProjectDialogProps
+export default function DeleteTaskAlertDialog(
+  props: DeleteTaskAlertDialogProps
 ) {
   const [open, setOpen] = useState(false);
+  const setTask = useSetAtom(editTaskAtom);
 
-  const { workspaceId, projectId } = props;
+  const { workspaceId, projectId, columnId, taskId } = props;
   const { toast } = useToast();
 
   async function handleAction(formData: FormData) {
-    const res = await deleteProject(formData);
+    const res = await deleteTask(formData);
     if (res.error || res.result?.error) {
       toast({
         title: "Error",
@@ -49,13 +54,15 @@ export default function DeleteProjectAlertDialog(
         variant: "destructive",
       });
       setOpen(false);
+      setTask(null);
       return;
     }
     toast({
       title: "Success",
-      description: "Project deleted !",
+      description: "Task deleted !",
     });
     setOpen(false);
+    setTask(null);
   }
 
   return (
@@ -64,11 +71,15 @@ export default function DeleteProjectAlertDialog(
         onClick={() => {
           setOpen(true);
         }}
+        type="submit"
         variant="ghost"
-        size="sm"
-        className="text-neutral-300 px-2"
+        size="xs"
+        className="ml-2"
       >
-        <Trash2 size={18} />
+        <div className="w-full flex items-center gap-2">
+          <Trash2 size={16} />
+          Delete
+        </div>
       </Button>
       <AlertDialog
         open={open}
@@ -81,7 +92,7 @@ export default function DeleteProjectAlertDialog(
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete the
-              project and all the data linked to it.
+              task and all the data linked to it.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -90,6 +101,8 @@ export default function DeleteProjectAlertDialog(
               <form action={handleAction}>
                 <input type="hidden" value={workspaceId} name="workspaceId" />
                 <input type="hidden" value={projectId} name="projectId" />
+                <input type="hidden" value={columnId} name="columnId" />
+                <input type="hidden" value={taskId} name="taskId" />
                 <SubmitButton />
               </form>
             </AlertDialogAction>

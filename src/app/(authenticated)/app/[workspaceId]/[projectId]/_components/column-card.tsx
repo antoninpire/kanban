@@ -4,6 +4,7 @@ import DeleteColumnAlertDialog from "@/app/(authenticated)/app/[workspaceId]/[pr
 import TaskCard from "@/app/(authenticated)/app/[workspaceId]/[projectId]/_components/task-card";
 import {
   addTaskColumnIdAtom,
+  editColumnAtom,
   type TaskWithRelations,
 } from "@/app/(authenticated)/app/[workspaceId]/[projectId]/atoms";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Column } from "@/lib/db/schema";
+import { hexToRgb } from "@/lib/utils";
 import { useSetAtom } from "jotai";
 import { Edit, MoreHorizontal, Plus } from "lucide-react";
 import { Draggable, Droppable } from "react-beautiful-dnd";
@@ -30,26 +32,31 @@ type ColumnCardProps = {
 export default function ColumnCard(props: ColumnCardProps) {
   const { column, index, projectId, workspaceId } = props;
   const setColumnId = useSetAtom(addTaskColumnIdAtom);
+  const setEditColumn = useSetAtom(editColumnAtom);
 
-  // const rgb = hexToRgb(column.color).join(",");
+  const rgb = hexToRgb(column.color).join(",");
 
   return (
     <Draggable draggableId={column.id} index={index}>
       {(provided) => (
-        <div
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          // className="h-[80vh] w-[280px] rounded-md flex flex-col gap-1 brightness-200"
-          // style={{
-          //   ...provided.draggableProps.style,
-          //   backgroundColor: `rgba(${rgb}, 0.2)`,
-          // }}
-        >
+        <div ref={provided.innerRef} {...provided.draggableProps}>
           <div
             {...provided.dragHandleProps}
-            className="flex items-center justify-between pl-2.5 pr-1 mb-1"
+            className="flex items-center justify-between pr-1 mb-1"
           >
-            <h4 className="font-semibold">{column.name}</h4>
+            <div className="flex items-center gap-2">
+              <h4
+                className="font-semibold text-white px-5 py-0.5 rounded-full brightness-200"
+                style={{
+                  backgroundColor: `rgba(${rgb}, 0.07)`,
+                }}
+              >
+                {column.name}
+              </h4>
+              <span className="text-neutral-300 font-medium">
+                {column.tasks.length}
+              </span>
+            </div>
             <div className="flex items-center">
               <Button
                 onClick={() => {
@@ -69,7 +76,13 @@ export default function ColumnCard(props: ColumnCardProps) {
                 </PopoverTrigger>
                 <PopoverContent className="w-40 p-0">
                   <div className="flex flex-col gap-1 w-full p-1">
-                    <Button variant="ghost" size="xs">
+                    <Button
+                      variant="ghost"
+                      size="xs"
+                      onClick={() => {
+                        setEditColumn(column);
+                      }}
+                    >
                       <div className="w-full flex items-center gap-2">
                         <Edit size={16} />
                         Edit
@@ -87,20 +100,28 @@ export default function ColumnCard(props: ColumnCardProps) {
           </div>
           <Droppable key={column.id} droppableId={column.id} type="TASK">
             {(dropProvided) => (
-              <>
-                <ScrollArea className="bg-white/5 rounded-md pt-1 pb-2">
+              <div
+                style={{ backgroundColor: `rgba(${rgb}, 0.07)` }}
+                className="rounded-md"
+              >
+                <ScrollArea className="rounded-md pt-1 pb-2">
                   <div
                     className="h-[75vh] flex flex-col w-[280px] p-[10px] gap-3"
                     ref={dropProvided.innerRef}
                     {...dropProvided.droppableProps}
                   >
                     {column.tasks.map((task, index) => (
-                      <TaskCard key={task.id} task={task} index={index} />
+                      <TaskCard
+                        color={column.color}
+                        key={task.id}
+                        task={task}
+                        index={index}
+                      />
                     ))}
                     {dropProvided.placeholder}
                   </div>
                 </ScrollArea>
-              </>
+              </div>
             )}
           </Droppable>
         </div>

@@ -1,6 +1,6 @@
 /* eslint-disable no-relative-import-paths/no-relative-import-paths */
 import { relations, type InferSelectModel } from "drizzle-orm";
-import { int, primaryKey, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { primaryKey, timestamp, varchar } from "drizzle-orm/mysql-core";
 import { mysqlTable } from "../mysql-table";
 import { tags } from "./tags";
 import { tasks } from "./tasks";
@@ -8,7 +8,7 @@ import { tasks } from "./tasks";
 export const tagsByTasks = mysqlTable(
   "tags-by-tasks",
   {
-    tagId: int("tagId").notNull(),
+    tagId: varchar("tagId", { length: 30 }).notNull(),
     taskId: varchar("taskId", { length: 30 }).notNull(),
     createdAt: timestamp("createdAt")
       .notNull()

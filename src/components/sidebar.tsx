@@ -1,3 +1,4 @@
+import CreateWorkspaceDialog from "@/app/(authenticated)/app/[workspaceId]/_components/create-workspace-dialog";
 import SidebarLink from "@/components/sidebar-link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -70,8 +71,12 @@ export default async function Sidebar(props: SidebarProps) {
   if (!workspacesByUser.some((ws) => ws.userId === user.userId))
     redirect("/app");
 
+  const currentWorkspace = workspacesByUser.find(
+    (ws) => ws.workspaceId === workspaceId
+  );
+
   return (
-    <aside className="w-64 inset-0 fixed h-screen bg-white/5 py-6 px-4 flex flex-col justify-between">
+    <aside className="w-64 inset-0 fixed h-screen bg-[#202020] py-6 px-4 flex flex-col justify-between">
       <div>
         <Popover>
           <PopoverTrigger asChild>
@@ -80,7 +85,7 @@ export default async function Sidebar(props: SidebarProps) {
               role="combobox"
               className="w-full justify-between"
             >
-              Select workspace
+              {currentWorkspace?.workspace.name ?? "Select workspace"}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
@@ -91,7 +96,7 @@ export default async function Sidebar(props: SidebarProps) {
                 className="text-sm"
               />
               <CommandEmpty className="text-sm">
-                No worksapce found.
+                No workspace found.
               </CommandEmpty>
               <CommandGroup className="text-sm">
                 {workspacesByUser.map((workspaceByUser) => (
@@ -99,10 +104,7 @@ export default async function Sidebar(props: SidebarProps) {
                     href={`/app/${workspaceByUser.workspaceId}`}
                     key={workspaceByUser.workspaceId}
                   >
-                    <div
-                      className="flex items-center justify-between
-                      } px-2 py-1.5 rounded-[7px] hover:bg-white/5"
-                    >
+                    <div className="flex items-center justify-between px-2 py-1.5 rounded-[7px] hover:bg-white/5">
                       {workspaceByUser.workspace.name}
                       {workspaceByUser.workspaceId === workspaceId && (
                         <Check className="w-4 h-4" />
@@ -110,6 +112,7 @@ export default async function Sidebar(props: SidebarProps) {
                     </div>
                   </Link>
                 ))}
+                <CreateWorkspaceDialog />
               </CommandGroup>
             </Command>
           </PopoverContent>

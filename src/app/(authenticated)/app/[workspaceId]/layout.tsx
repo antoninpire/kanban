@@ -23,7 +23,9 @@ export default async function AppLayout({
         workspaceId={params.workspaceId}
         projectId={params.projectId}
       />
-      <main className="ml-64 w-[calc(100vw-16rem)] h-full">{children}</main>
+      <main className="ml-64 w-[calc(100vw-16rem)] h-full bg-background">
+        {children}
+      </main>
     </>
   );
 }

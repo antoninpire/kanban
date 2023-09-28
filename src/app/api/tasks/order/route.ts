@@ -71,7 +71,7 @@ export async function PUT(request: NextRequest) {
       promises.push(
         db
           .update(tasks)
-          .set({ columnId: destinationColumnId })
+          .set({ columnId: destinationColumnId, updatedAt: new Date() })
           .where(eq(tasks.id, taskId))
       );
 
