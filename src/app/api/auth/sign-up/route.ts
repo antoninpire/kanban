@@ -53,6 +53,7 @@ export async function POST(request: NextRequest) {
       db.insert(workspacesByUsers).values({
         userId: user.userId,
         workspaceId,
+        role: "OWNER",
       }),
     ]);
     const authRequest = auth.handleRequest(request.method, context);

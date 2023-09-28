@@ -188,6 +188,7 @@ export const createWorkspace = serverAction({
         db.insert(workspacesByUsers).values({
           workspaceId: workspaceId,
           userId: session.user.userId,
+          role: "OWNER",
         }),
       ]);
       return {

@@ -81,6 +81,7 @@ export const GET = async (request: NextRequest) => {
         db.insert(workspacesByUsers).values({
           userId: user.userId,
           workspaceId,
+          role: "OWNER",
         }),
       ]);
     } else {

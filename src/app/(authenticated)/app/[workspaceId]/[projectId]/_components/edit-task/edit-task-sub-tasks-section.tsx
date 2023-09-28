@@ -68,7 +68,7 @@ export default function EditTaskSubTasksSection(
             key={"subTask" + subTask.id}
             className="flex items-center justify-between"
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full">
               <Checkbox
                 checked={subTask.achieved}
                 id={"subTask" + subTask.id}
@@ -93,7 +93,7 @@ export default function EditTaskSubTasksSection(
               />
               <label
                 htmlFor={"subTask" + subTask.id}
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 w-full"
               >
                 <input
                   id={"subTask" + subTask.id + "input"}
@@ -147,7 +147,7 @@ export default function EditTaskSubTasksSection(
                   }}
                   type="text"
                   defaultValue={subTask.title}
-                  className="w-full bg-transparent py-2 outline-none border-none"
+                  className="w-full bg-transparent py-2 outline-none border-none flex-grow"
                   placeholder="Your subtask here..."
                 />
               </label>
