@@ -24,7 +24,7 @@ export const columns = mysqlTable(
       .$defaultFn(() => new Date()),
   },
   (table) => ({
-    projectIds: index("project_idx").on(table.projectId),
+    projectIdx: index("project_idx").on(table.projectId),
   })
 );
 
