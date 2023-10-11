@@ -15,11 +15,11 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
 import { type Tag as TTag } from "@/lib/db/schema";
 import { useAtom } from "jotai";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 type EditTaskSheetProps = {
   workspaceId: string;
@@ -32,7 +32,6 @@ export default function EditTaskSheet(props: EditTaskSheetProps) {
   const [somethingHasChanged, setSomethingHasChanged] = useState(false);
 
   const { workspaceId, tags, projectId } = props;
-  const { toast } = useToast();
   const router = useRouter();
 
   const handleSubmit = async () => {
@@ -50,11 +49,7 @@ export default function EditTaskSheet(props: EditTaskSheetProps) {
     const json = await result.json();
 
     if (!result.ok || !json.success) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: json.error ?? "Something went wrong",
-      });
+      toast.error(json.error ?? "Something went wrong");
     } else router.refresh();
   };
 

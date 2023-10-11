@@ -18,12 +18,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/components/ui/use-toast";
 import type { Column } from "@/lib/db/schema";
 import { getRandomColorHex } from "@/lib/utils";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { experimental_useFormStatus as useFormStatus } from "react-dom";
+import { toast } from "sonner";
 
 type AddColumnDialogProps = {
   columns: Column[];
@@ -44,22 +44,13 @@ function SubmitButton() {
 export default function AddColumnDialog(props: AddColumnDialogProps) {
   const [open, setOpen] = useState(false);
 
-  const { toast } = useToast();
-
   async function handleAction(formData: FormData) {
     const res = await createColumn(formData);
     if (res.error || res.result?.error) {
-      toast({
-        title: "Error",
-        description: res.result?.error ?? res.error,
-        variant: "destructive",
-      });
+      toast.error(res.result?.error ?? res.error);
       return;
     }
-    toast({
-      title: "Success",
-      description: "Column added !",
-    });
+    toast.success("Column added !");
     setOpen(false);
   }
 

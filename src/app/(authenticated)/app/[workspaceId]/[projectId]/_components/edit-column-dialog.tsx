@@ -12,9 +12,9 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
 import { useAtom } from "jotai";
 import { experimental_useFormStatus as useFormStatus } from "react-dom";
+import { toast } from "sonner";
 
 type EditColumnDialogProps = {
   workspaceId: string;
@@ -34,22 +34,13 @@ function SubmitButton() {
 export default function EditColumnDialog(props: EditColumnDialogProps) {
   const [column, setColumn] = useAtom(editColumnAtom);
 
-  const { toast } = useToast();
-
   async function handleAction(formData: FormData) {
     const res = await editColumn(formData);
     if (res.error || res.result?.error) {
-      toast({
-        title: "Error",
-        description: res.result?.error ?? res.error,
-        variant: "destructive",
-      });
+      toast.error(res.result?.error ?? res.error);
       return;
     }
-    toast({
-      title: "Success",
-      description: "Column updated !",
-    });
+    toast.success("Column updated !");
     setColumn(null);
   }
 

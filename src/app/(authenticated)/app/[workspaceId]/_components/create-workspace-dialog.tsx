@@ -11,11 +11,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { experimental_useFormStatus as useFormStatus } from "react-dom";
+import { toast } from "sonner";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -30,23 +30,15 @@ function SubmitButton() {
 export default function CreateWorkspaceDialog() {
   const [open, setOpen] = useState(false);
 
-  const { toast } = useToast();
   const router = useRouter();
 
   async function handleAction(formData: FormData) {
     const res = await createWorkspace(formData);
     if (res.error || res.result?.error || !res.result?.workspaceId) {
-      toast({
-        title: "Error",
-        description: res.result?.error ?? res.error,
-        variant: "destructive",
-      });
+      toast.error(res.result?.error ?? res.error);
       return;
     }
-    toast({
-      title: "Success",
-      description: "Workspace created !",
-    });
+    toast.success("Workspace created !");
     setOpen(false);
     router.push("/app/" + res.result.workspaceId);
   }

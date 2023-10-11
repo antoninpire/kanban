@@ -10,13 +10,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useToast } from "@/components/ui/use-toast";
 import type { Tag } from "@/lib/db/schema";
 import { getRandomColorHex } from "@/lib/utils";
 import { createId } from "@paralleldrive/cuid2";
 import { Plus, Tags, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 type ManageTagsDialogProps = {
   tags: Tag[];
@@ -37,7 +37,6 @@ export default function ManageTagsDialog(props: ManageTagsDialogProps) {
     setTags(props.tags);
   }, [props.tags, open]);
 
-  const { toast } = useToast();
   const router = useRouter();
 
   async function handleSave() {
@@ -52,11 +51,7 @@ export default function ManageTagsDialog(props: ManageTagsDialogProps) {
     });
     const json = await response.json();
     if (!response.ok || json.error) {
-      toast({
-        title: "Error",
-        description: json.error || "Something went wrong",
-        variant: "destructive",
-      });
+      toast.error(json.error || "Something went wrong");
     } else {
       router.refresh();
       setOpen(false);

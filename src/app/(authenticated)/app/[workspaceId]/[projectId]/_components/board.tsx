@@ -2,7 +2,6 @@
 
 import ColumnCard from "@/app/(authenticated)/app/[workspaceId]/[projectId]/_components/column-card";
 import { type TaskWithRelations } from "@/app/(authenticated)/app/[workspaceId]/[projectId]/atoms";
-import { useToast } from "@/components/ui/use-toast";
 import type { Column } from "@/lib/db/schema";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -11,6 +10,7 @@ import {
   Droppable,
   type DropResult,
 } from "react-beautiful-dnd";
+import { toast } from "sonner";
 
 type BoardProps = {
   columns: (Column & {
@@ -25,7 +25,6 @@ export default function Board(props: BoardProps) {
   const [mounted, setMounted] = useState(false);
 
   const router = useRouter();
-  const { toast } = useToast();
 
   useEffect(() => {
     setColumns(props.columns);
@@ -80,10 +79,7 @@ export default function Board(props: BoardProps) {
 
       if (!res.ok || !json.success) {
         router.refresh();
-        toast({
-          title: json.error ?? "Something went wrong",
-          variant: "destructive",
-        });
+        toast.error(json.error ?? "Something went wrong");
       }
 
       return;
@@ -148,12 +144,8 @@ export default function Board(props: BoardProps) {
 
         if (!res.ok || !json.success) {
           router.refresh();
-          toast({
-            title: json.error ?? "Something went wrong",
-            variant: "destructive",
-          });
+          toast.error(json.error ?? "Something went wrong");
         }
-
         return;
       } else {
         const column = columns[sourceColumnIndex];
@@ -190,10 +182,7 @@ export default function Board(props: BoardProps) {
 
         if (!res.ok || !json.success) {
           router.refresh();
-          toast({
-            title: json.error ?? "Something went wrong",
-            variant: "destructive",
-          });
+          toast.error(json.error ?? "Something went wrong");
         }
 
         return;

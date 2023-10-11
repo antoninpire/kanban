@@ -12,10 +12,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { experimental_useFormStatus as useFormStatus } from "react-dom";
+import { toast } from "sonner";
 
 type DeleteColumnAlertDialogProps = {
   workspaceId: string;
@@ -39,23 +39,15 @@ export default function DeleteColumnAlertDialog(
   const [open, setOpen] = useState(false);
 
   const { workspaceId, projectId, columnId } = props;
-  const { toast } = useToast();
 
   async function handleAction(formData: FormData) {
     const res = await deleteColumn(formData);
     if (res.error || res.result?.error) {
-      toast({
-        title: "Error",
-        description: res.result?.error ?? res.error,
-        variant: "destructive",
-      });
+      toast.error(res.result?.error ?? res.error);
       setOpen(false);
       return;
     }
-    toast({
-      title: "Success",
-      description: "Column removed !",
-    });
+    toast.success("Column removed !");
     setOpen(false);
   }
 

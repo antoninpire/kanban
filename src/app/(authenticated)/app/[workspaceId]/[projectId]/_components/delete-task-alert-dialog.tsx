@@ -13,11 +13,11 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
 import { useSetAtom } from "jotai";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { experimental_useFormStatus as useFormStatus } from "react-dom";
+import { toast } from "sonner";
 
 type DeleteTaskAlertDialogProps = {
   workspaceId: string;
@@ -43,24 +43,16 @@ export default function DeleteTaskAlertDialog(
   const setTask = useSetAtom(editTaskAtom);
 
   const { workspaceId, projectId, columnId, taskId } = props;
-  const { toast } = useToast();
 
   async function handleAction(formData: FormData) {
     const res = await deleteTask(formData);
     if (res.error || res.result?.error) {
-      toast({
-        title: "Error",
-        description: res.result?.error ?? res.error,
-        variant: "destructive",
-      });
+      toast.error(res.result?.error ?? res.error);
       setOpen(false);
       setTask(null);
       return;
     }
-    toast({
-      title: "Success",
-      description: "Task deleted !",
-    });
+    toast.success("Task deleted !");
     setOpen(false);
     setTask(null);
   }

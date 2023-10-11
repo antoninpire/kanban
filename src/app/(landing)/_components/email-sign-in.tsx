@@ -2,9 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { toast } from "sonner";
 
 type EmailSignInProps = {
   action: string;
@@ -15,7 +15,6 @@ export default function EmailSignIn(props: EmailSignInProps) {
 
   const { action } = props;
   const router = useRouter();
-  const { toast } = useToast();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -29,16 +28,11 @@ export default function EmailSignIn(props: EmailSignInProps) {
     setIsLoading(false);
 
     if (response.status === 0) return router.refresh();
-    if (response.status === 500)
-      return toast({
-        variant: "destructive",
-        title: "Wrong credentials",
-      });
+    if (response.status === 500) return toast.error("Wrong credentials");
     else if (response.status === 400) {
-      return toast({
-        variant: "destructive",
-        title: (await response.json()).error ?? "Something went wrong",
-      });
+      return toast.error(
+        (await response.json()).error ?? "Something went wrong"
+      );
     }
   }
 

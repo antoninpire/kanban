@@ -14,12 +14,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
 import type { Tag } from "@/lib/db/schema";
 import { hexToRgb } from "@/lib/utils";
 import { useAtom } from "jotai";
 import { useState } from "react";
 import { experimental_useFormStatus as useFormStatus } from "react-dom";
+import { toast } from "sonner";
 
 type AddTaskDialogProps = {
   projectId: string;
@@ -45,22 +45,14 @@ export default function AddTaskDialog(props: AddTaskDialogProps) {
   const [currentTagIds, setCurrentTagIds] = useState<string[]>([]);
 
   const { projectId, workspaceId, tags } = props;
-  const { toast } = useToast();
 
   async function handleAction(formData: FormData) {
     const res = await createTask(formData);
     if (res.error || res.result?.error) {
-      toast({
-        title: "Error",
-        description: res.result?.error ?? res.error,
-        variant: "destructive",
-      });
+      toast.error(res.result?.error ?? res.error);
       return;
     }
-    toast({
-      title: "Success",
-      description: "Column added !",
-    });
+    toast.success("Column added !");
     setCurrentTagIds([]);
     setPriority(undefined);
     setColumnId(null);
