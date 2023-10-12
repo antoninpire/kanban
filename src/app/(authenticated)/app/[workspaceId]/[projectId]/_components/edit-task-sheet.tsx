@@ -102,6 +102,7 @@ export default function EditTaskSheet(props: EditTaskSheetProps) {
                       ...task,
                       title: e.target.value,
                     });
+                  handleChange();
                 }}
               />
             </div>
