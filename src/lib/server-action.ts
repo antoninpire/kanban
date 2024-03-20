@@ -1,4 +1,8 @@
+import type { Session } from "lucia";
+import * as context from "next/headers";
 import type { z } from "zod";
+
+import { auth } from "@/lib/lucia";
 
 type Result<TResult> =
   | {
@@ -14,7 +18,7 @@ export function serverAction<TInput, TOutput = void>(opts: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   input: z.ZodSchema<TInput, any, any>;
   output?: z.ZodSchema<TOutput>;
-  handler: (args: { input: TInput }) => Promise<TOutput>;
+  handler: (args: { input: TInput; session: Session }) => Promise<TOutput>;
 }): (formData: FormData) => Promise<Result<TOutput>> {
   return async (formData: FormData) => {
     const req: Record<string, unknown> = {};
@@ -22,6 +26,7 @@ export function serverAction<TInput, TOutput = void>(opts: {
       req[k] = v;
     });
 
+    // verify input
     const input = opts.input.safeParse(req);
     if (!input.success) {
       return {
@@ -29,8 +34,18 @@ export function serverAction<TInput, TOutput = void>(opts: {
       };
     }
 
+    // verify session
+    const authRequest = auth.handleRequest("POST", context);
+    const session = await authRequest.validate();
+
+    if (!session) {
+      return {
+        error: "You must be logged in to do that !",
+      };
+    }
+
     try {
-      const result = await opts.handler({ input: input.data });
+      const result = await opts.handler({ input: input.data, session });
       return { result };
     } catch (e) {
       return { error: (e as Error).message };

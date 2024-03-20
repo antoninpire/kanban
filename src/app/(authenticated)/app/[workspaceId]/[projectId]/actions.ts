@@ -2,12 +2,10 @@
 
 import { db } from "@/lib/db";
 import { columns, tagsByTasks, tasks } from "@/lib/db/schema";
-import { auth } from "@/lib/lucia";
 import { serverAction } from "@/lib/server-action";
 import { createId } from "@paralleldrive/cuid2";
 import { eq, gt, gte } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import * as context from "next/headers";
 import { z } from "zod";
 
 export const createColumn = serverAction({
@@ -18,16 +16,7 @@ export const createColumn = serverAction({
     color: z.string().min(1),
     order: z.union([z.string(), z.number()]).transform(Number),
   }),
-  handler: async ({ input }) => {
-    const authRequest = auth.handleRequest("POST", context);
-    const session = await authRequest.validate();
-
-    if (!session) {
-      return {
-        error: "You must be logged in to add a column to a project",
-      };
-    }
-
+  handler: async ({ input, session }) => {
     const workspaces = await db.query.workspacesByUsers.findMany({
       where: (table, { eq }) => eq(table.userId, session.user.userId),
     });
@@ -94,16 +83,7 @@ export const editColumn = serverAction({
     name: z.string().min(1, "Name cannot be empty"),
     color: z.string().min(1),
   }),
-  handler: async ({ input }) => {
-    const authRequest = auth.handleRequest("POST", context);
-    const session = await authRequest.validate();
-
-    if (!session) {
-      return {
-        error: "You must be logged in to add a column to a project",
-      };
-    }
-
+  handler: async ({ input, session }) => {
     const workspaces = await db.query.workspacesByUsers.findMany({
       where: (table, { eq }) => eq(table.userId, session.user.userId),
     });
@@ -141,16 +121,7 @@ export const deleteColumn = serverAction({
     projectId: z.string().min(1),
     workspaceId: z.string().min(1),
   }),
-  handler: async ({ input }) => {
-    const authRequest = auth.handleRequest("POST", context);
-    const session = await authRequest.validate();
-
-    if (!session) {
-      return {
-        error: "You must be logged in to delete a column from a project",
-      };
-    }
-
+  handler: async ({ input, session }) => {
     const workspaces = await db.query.workspacesByUsers.findMany({
       where: (table, { eq }) => eq(table.userId, session.user.userId),
     });
@@ -211,16 +182,7 @@ export const createTask = serverAction({
     priority: z.enum(["low", "medium", "high", ""]),
     tags: z.string(),
   }),
-  handler: async ({ input }) => {
-    const authRequest = auth.handleRequest("POST", context);
-    const session = await authRequest.validate();
-
-    if (!session) {
-      return {
-        error: "You must be logged in to add a task to a project",
-      };
-    }
-
+  handler: async ({ input, session }) => {
     const workspaces = await db.query.workspacesByUsers.findMany({
       where: (table, { eq }) => eq(table.userId, session.user.userId),
     });
@@ -276,16 +238,7 @@ export const deleteTask = serverAction({
     columnId: z.string().min(1),
     workspaceId: z.string().min(1),
   }),
-  handler: async ({ input }) => {
-    const authRequest = auth.handleRequest("POST", context);
-    const session = await authRequest.validate();
-
-    if (!session) {
-      return {
-        error: "You must be logged in to delete a column from a project",
-      };
-    }
-
+  handler: async ({ input, session }) => {
     const workspaces = await db.query.workspacesByUsers.findMany({
       where: (table, { eq }) => eq(table.userId, session.user.userId),
     });
