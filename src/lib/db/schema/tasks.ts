@@ -1,36 +1,29 @@
 /* eslint-disable no-relative-import-paths/no-relative-import-paths */
 import { createId } from "@paralleldrive/cuid2";
-import { relations, type InferSelectModel } from "drizzle-orm";
-import {
-  index,
-  mysqlEnum,
-  smallint,
-  text,
-  timestamp,
-  varchar,
-} from "drizzle-orm/mysql-core";
-import { mysqlTable } from "../mysql-table";
+import { relations, sql, type InferSelectModel } from "drizzle-orm";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { columns } from "./columns";
 import { subTasks } from "./sub-tasks";
 import { tagsByTasks } from "./tags-by-tasks";
 
-export const tasks = mysqlTable(
+export const tasks = sqliteTable(
   "tasks",
   {
-    id: varchar("id", { length: 30 })
+    id: text("id", { length: 30 })
       .primaryKey()
       .$defaultFn(() => `tsk_${createId()}`),
-    title: varchar("title", { length: 75 }).notNull(),
+    title: text("title", { length: 75 }).notNull(),
     description: text("description"),
-    order: smallint("order").notNull().default(0),
-    priority: mysqlEnum("priority", ["low", "medium", "high"]),
-    columnId: varchar("columnId", { length: 30 }).notNull(),
-    updatedAt: timestamp("updatedAt")
+    order: integer("order").notNull().default(0),
+    priority: text("priority", { enum: ["low", "medium", "high"] }),
+    columnId: text("columnId", { length: 30 }).notNull(),
+    updatedAt: integer("updatedAt", { mode: "timestamp" })
       .notNull()
-      .$defaultFn(() => new Date()),
-    createdAt: timestamp("createdAt")
+      .default(sql`(strftime('%s', 'now'))`),
+
+    createdAt: integer("createdAt", { mode: "timestamp" })
       .notNull()
-      .$defaultFn(() => new Date()),
+      .default(sql`(strftime('%s', 'now'))`),
   },
   (table) => ({
     columnIdx: index("column_idx").on(table.columnId),

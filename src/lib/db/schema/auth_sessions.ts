@@ -1,19 +1,18 @@
 /* eslint-disable no-relative-import-paths/no-relative-import-paths */
-import { bigint, varchar } from "drizzle-orm/mysql-core";
-import { mysqlTable } from "../mysql-table";
+import { blob, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-export const authSessions = mysqlTable("auth_sessions", {
-  id: varchar("id", {
+export const authSessions = sqliteTable("auth_sessions", {
+  id: text("id", {
     length: 128,
   }).primaryKey(),
-  userId: varchar("user_id", {
+  userId: text("user_id", {
     length: 25,
   }).notNull(),
-  activeExpires: bigint("active_expires", {
-    mode: "number",
+  activeExpires: blob("active_expires", {
+    mode: "bigint",
   }).notNull(),
-  idleExpires: bigint("idle_expires", {
-    mode: "number",
+  idleExpires: blob("idle_expires", {
+    mode: "bigint",
   }).notNull(),
-  email: varchar("email", { length: 128 }),
+  email: text("email", { length: 128 }),
 });

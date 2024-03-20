@@ -1,27 +1,28 @@
 /* eslint-disable no-relative-import-paths/no-relative-import-paths */
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
-  mysqlEnum,
+  integer,
   primaryKey,
-  timestamp,
-  varchar,
-} from "drizzle-orm/mysql-core";
-import { mysqlTable } from "../mysql-table";
+  sqliteTable,
+  text,
+} from "drizzle-orm/sqlite-core";
 import { users } from "./users";
 import { workspaces } from "./workspaces";
 
-export const workspacesByUsers = mysqlTable(
+export const workspacesByUsers = sqliteTable(
   "workspaces-by-users",
   {
-    userId: varchar("userId", { length: 25 }).notNull(),
-    workspaceId: varchar("workspaceId", { length: 28 }).notNull(),
-    createdAt: timestamp("createdAt")
+    userId: text("userId", { length: 25 }).notNull(),
+    workspaceId: text("workspaceId", { length: 28 }).notNull(),
+    createdAt: integer("createdAt", { mode: "timestamp" })
       .notNull()
-      .$defaultFn(() => new Date()),
-    role: mysqlEnum("role", ["OWNER", "MEMBER"]).default("MEMBER"),
+      .default(sql`(strftime('%s', 'now'))`),
+    role: text("role", { enum: ["OWNER", "MEMBER"] }).default("MEMBER"),
   },
   (table) => ({
-    pk: primaryKey(table.userId, table.workspaceId),
+    pk: primaryKey({
+      columns: [table.userId, table.workspaceId],
+    }),
   })
 );
 

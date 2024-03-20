@@ -1,14 +1,13 @@
 /* eslint-disable no-relative-import-paths/no-relative-import-paths */
 import { relations } from "drizzle-orm";
-import { varchar } from "drizzle-orm/mysql-core";
-import { mysqlTable } from "../mysql-table";
+import { sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { workspacesByUsers } from "./workspaces-by-users";
 
-export const users = mysqlTable("users", {
-  id: varchar("id", {
+export const users = sqliteTable("users", {
+  id: text("id", {
     length: 25,
   }).primaryKey(),
-  email: varchar("email", { length: 128 }).unique(),
+  email: text("email", { length: 128 }).unique(),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({

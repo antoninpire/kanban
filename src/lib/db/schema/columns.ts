@@ -1,30 +1,29 @@
 /* eslint-disable no-relative-import-paths/no-relative-import-paths */
 import { createId } from "@paralleldrive/cuid2";
-import { relations, type InferSelectModel } from "drizzle-orm";
-import { index, smallint, timestamp, varchar } from "drizzle-orm/mysql-core";
-import { mysqlTable } from "../mysql-table";
+import { relations, sql, type InferSelectModel } from "drizzle-orm";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { projects } from "./projects";
 import { tasks } from "./tasks";
 
-export const columns = mysqlTable(
+export const columns = sqliteTable(
   "columns",
   {
-    id: varchar("id", { length: 30 })
+    id: text("id", { length: 30 })
       .primaryKey()
       .$defaultFn(() => `col_${createId()}`),
-    name: varchar("name", { length: 75 }).notNull(),
-    projectId: varchar("projectId", { length: 28 }).notNull(),
-    order: smallint("order").notNull().default(0),
-    color: varchar("color", { length: 7 }).notNull(),
-    updatedAt: timestamp("updatedAt")
+    name: text("name", { length: 75 }).notNull(),
+    projectId: text("projectId", { length: 28 }).notNull(),
+    order: integer("order").notNull().default(0),
+    color: text("color", { length: 7 }).notNull(),
+    updatedAt: integer("updatedAt", { mode: "timestamp" })
       .notNull()
-      .$defaultFn(() => new Date()),
-    createdAt: timestamp("createdAt")
+      .default(sql`(strftime('%s', 'now'))`),
+    createdAt: integer("createdAt", { mode: "timestamp" })
       .notNull()
-      .$defaultFn(() => new Date()),
+      .default(sql`(strftime('%s', 'now'))`),
   },
   (table) => ({
-    projectIdx: index("project_idx").on(table.projectId),
+    projectIdx: index("columns_project_idx").on(table.projectId),
   })
 );
 

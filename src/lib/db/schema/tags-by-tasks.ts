@@ -1,21 +1,27 @@
 /* eslint-disable no-relative-import-paths/no-relative-import-paths */
-import { relations, type InferSelectModel } from "drizzle-orm";
-import { primaryKey, timestamp, varchar } from "drizzle-orm/mysql-core";
-import { mysqlTable } from "../mysql-table";
+import { relations, sql, type InferSelectModel } from "drizzle-orm";
+import {
+  integer,
+  primaryKey,
+  sqliteTable,
+  text,
+} from "drizzle-orm/sqlite-core";
 import { tags } from "./tags";
 import { tasks } from "./tasks";
 
-export const tagsByTasks = mysqlTable(
+export const tagsByTasks = sqliteTable(
   "tags-by-tasks",
   {
-    tagId: varchar("tagId", { length: 30 }).notNull(),
-    taskId: varchar("taskId", { length: 30 }).notNull(),
-    createdAt: timestamp("createdAt")
+    tagId: text("tagId", { length: 30 }).notNull(),
+    taskId: text("taskId", { length: 30 }).notNull(),
+    createdAt: integer("createdAt", { mode: "timestamp" })
       .notNull()
-      .$defaultFn(() => new Date()),
+      .default(sql`(strftime('%s', 'now'))`),
   },
   (table) => ({
-    pk: primaryKey(table.tagId, table.taskId),
+    pk: primaryKey({
+      columns: [table.tagId, table.taskId],
+    }),
   })
 );
 

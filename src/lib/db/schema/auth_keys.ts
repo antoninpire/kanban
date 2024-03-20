@@ -1,15 +1,14 @@
 /* eslint-disable no-relative-import-paths/no-relative-import-paths */
-import { varchar } from "drizzle-orm/mysql-core";
-import { mysqlTable } from "../mysql-table";
+import { sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-export const authKeys = mysqlTable("auth_keys", {
-  id: varchar("id", {
+export const authKeys = sqliteTable("auth_keys", {
+  id: text("id", {
     length: 255,
   }).primaryKey(),
-  userId: varchar("user_id", {
+  userId: text("user_id", {
     length: 25,
   }).notNull(),
-  hashedPassword: varchar("hashed_password", {
+  hashedPassword: text("hashed_password", {
     length: 255,
   }),
 });

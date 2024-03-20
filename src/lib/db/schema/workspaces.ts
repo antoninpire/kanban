@@ -1,19 +1,18 @@
 /* eslint-disable no-relative-import-paths/no-relative-import-paths */
 import { createId } from "@paralleldrive/cuid2";
-import { relations } from "drizzle-orm";
-import { timestamp, varchar } from "drizzle-orm/mysql-core";
-import { mysqlTable } from "../mysql-table";
+import { relations, sql } from "drizzle-orm";
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { projects } from "./projects";
 import { workspacesByUsers } from "./workspaces-by-users";
 
-export const workspaces = mysqlTable("workspaces", {
-  id: varchar("id", { length: 28 })
+export const workspaces = sqliteTable("workspaces", {
+  id: text("id", { length: 28 })
     .primaryKey()
     .$defaultFn(() => `ws_${createId()}`),
-  name: varchar("name", { length: 75 }).notNull(),
-  createdAt: timestamp("createdAt")
+  name: text("name", { length: 75 }).notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" })
     .notNull()
-    .$defaultFn(() => new Date()),
+    .default(sql`(strftime('%s', 'now'))`),
 });
 
 export const workspacesRelations = relations(workspaces, ({ many }) => ({
